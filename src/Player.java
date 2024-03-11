@@ -1,16 +1,18 @@
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Player {
   private final String name;
   private ArrayList<Card> cards = new ArrayList<>();
-  private boolean[] cardsInFigure = new boolean[0];
+  private Map<Card, Boolean> cardInFigure = new HashMap<>();
+  private ArrayList<Card> sortedCards = new ArrayList<>();
   private ArrayList<Figure> figures = new ArrayList<>();
   private int score = 0;
 
   public Player(String name) {
     this.name = name;
-    findFiguresAndScore();
   }
 
   public String getName() {
@@ -23,91 +25,102 @@ public class Player {
 
   public void setCards(ArrayList<Card> cards) {
     this.cards = cards;
-    cardsInFigure = new boolean[cards.size()];
+  }
+
+  public void sortCards() {
+    cards.sort(Comparator.comparing(Card::getIndex));
+  }
+
+  private void computeFigures() {
     figures = new ArrayList<>();
-    findFiguresAndScore();
+    sortedCards = new ArrayList<>(cards);
+    sortedCards.sort(Comparator.comparing(Card::getIndex));
+    cardInFigure = new HashMap<>();
+
+    // Encontrar escaleras si las hay, debe ser el primer paso
+    ArrayList<Figure> flushes = findFlushes();
+    // Encontrar cuartas, ternas y pares
+    ArrayList<Figure> repeats = findRepeatFigures();
+
+    figures.addAll(flushes);
+    figures.addAll(repeats);
   }
 
   public ArrayList<Figure> getFigures() {
+    computeFigures();
     return figures;
   }
 
   public int getScore() {
+    computeScore();
     return score;
   }
 
-  public void sortCards() {
-    if (cards == null) {
-      return;
-    }
+  private void computeScore() {
+    score = 0;
 
-    cards.sort(Comparator.comparing(Card::getIndex));
+    for (Card card : cards) {
+      if (!cardInFigure.getOrDefault(card, false)) {
+        score += card.getValue();
+      }
+    }
   }
 
-  private void findFiguresAndScore() {
-    // Método para encontrar las figuras en la mano del jugador
-    if (cards == null) {
-      return;
-    }
-
-    findFlushes(); // Encontrar escaleras si las hay, debe ser el primer paso
-    findDuplicateCardFigures(); // Encontrar cuartas, ternas y pares
-    findScore();
-  }
-
-  private void findFlushes() {
+  private ArrayList<Figure> findFlushes() {
     // Método para encontrar las escaleras en la mano del jugador
-    if (cards == null) {
-      return;
-    }
-
     ArrayList<Figure> flushes = new ArrayList<>();
-    ArrayList<Card> sortedCards = new ArrayList<>(cards);
-    sortedCards.sort(Comparator.comparing(Card::getIndex));
 
     for (int i = 0; i < sortedCards.size(); i++) {
       ArrayList<Card> currentFlush = new ArrayList<>();
-      currentFlush.add(sortedCards.get(i));
+
+      Card currentCard = sortedCards.get(i);
+      currentFlush.add(currentCard);
+
+      if (cardInFigure.getOrDefault(currentCard, false)) {
+        continue;
+      }
 
       for (int j = i + 1; j < sortedCards.size(); j++) {
-        if (cardsInFigure[i]) {
-          continue;
-        }
+        Card jthCard = sortedCards.get(j);
 
-        if (sortedCards.get(j).getSuit() != sortedCards.get(i).getSuit()) {
+        if (cardInFigure.getOrDefault(jthCard, false)) {
           break;
         }
 
-        if (currentFlush.getLast().getIndex() == sortedCards.get(j).getIndex() - 1) {
-          currentFlush.add(sortedCards.get(j));
+        if (jthCard.getSuit() != currentCard.getSuit()) {
+          break;
+        }
+
+        if (currentFlush.get(currentFlush.size() - 1).getIndex() == jthCard.getIndex() - 1) {
+          currentFlush.add(jthCard);
         }
       }
 
       if (currentFlush.size() >= 2) {
         Figure currentFigure = new Figure(Figure.Type.FLUSH, currentFlush);
-        updateCardsInFigure(currentFigure);
+        updateCardsInFigure(currentFigure, cardInFigure);
         flushes.add(currentFigure);
       }
     }
 
-    figures.addAll(flushes);
+    return flushes;
   }
 
-  private void findDuplicateCardFigures() {
+  private ArrayList<Figure> findRepeatFigures() {
     // Método para encontrar las cuartas, ternas y pares en la mano del jugador, excluyendo las escaleras ya encontradas
-    if (cards == null) {
-      return;
-    }
+    ArrayList<Figure> repeats = new ArrayList<>();
 
     int[] cardsCount = new int[Card.Name.values().length];
 
     // Contar cuántas cartas hay de cada tipo excluyendo las que ya forman parte de una figura
-    for (int i = 0; i < cards.size(); i++) {
-      if (cardsInFigure[i]) {
+    for (int i = 0; i < sortedCards.size(); i++) {
+      Card currentCard = sortedCards.get(i);
+
+      if (cardInFigure.getOrDefault(currentCard, false)) {
         continue;
       }
 
-      cardsCount[cards.get(i).getName().ordinal()]++;
+      cardsCount[currentCard.getName().ordinal()]++;
     }
 
     for (int i = 0; i < cardsCount.length; i++) {
@@ -117,65 +130,53 @@ public class Player {
       if (cardsCount[i] == 4) {
         ArrayList<Card> quads = new ArrayList<>();
 
-        for (Card card : cards) {
+        for (Card card : sortedCards) {
           if (card.getName().ordinal() == i) {
             quads.add(card);
           }
         }
 
         currentFigure = new Figure(Figure.Type.QUADS, quads);
-        figures.add(currentFigure);
-        updateCardsInFigure(currentFigure);
+        repeats.add(currentFigure);
+        updateCardsInFigure(currentFigure, cardInFigure);
       }
 
       if (cardsCount[i] == 3) {
         ArrayList<Card> trips = new ArrayList<>();
 
-        for (Card card : cards) {
+        for (Card card : sortedCards) {
           if (card.getName().ordinal() == i) {
             trips.add(card);
           }
         }
 
         currentFigure = new Figure(Figure.Type.TRIPS, trips);
-        figures.add(currentFigure);
-        updateCardsInFigure(currentFigure);
+        repeats.add(currentFigure);
+        updateCardsInFigure(currentFigure, cardInFigure);
       }
 
       if (cardsCount[i] == 2) {
         ArrayList<Card> pair = new ArrayList<>();
 
-        for (Card card : cards) {
+        for (Card card : sortedCards) {
           if (card.getName().ordinal() == i) {
             pair.add(card);
           }
         }
 
         currentFigure = new Figure(Figure.Type.PAIR, pair);
-        figures.add(currentFigure);
-        updateCardsInFigure(currentFigure);
+        repeats.add(currentFigure);
+        updateCardsInFigure(currentFigure, cardInFigure);
       }
     }
+
+    return repeats;
   }
 
-  private void findScore() {
-    score = 0;
-
-    for (int i = 0; i < cardsInFigure.length; i++) {
-      if (!cardsInFigure[i]) {
-        score += cards.get(i).getValue();
-      }
-    }
-  }
-
-  private void updateCardsInFigure(Figure figure) {
+  private void updateCardsInFigure(Figure figure, Map<Card, Boolean> cardInFigure) {
     // Método para actualizar las cartas que forman parte de una figura
-    for (Card cardInFigure : figure.getCards()) {
-      for (int i = 0; i < cards.size(); i++) {
-        if (cards.get(i).getIndex() == cardInFigure.getIndex()) {
-          cardsInFigure[i] = true;
-        }
-      }
+    for (Card currentCard : figure.getCards()) {
+      cardInFigure.put(currentCard, true);
     }
   }
 }
