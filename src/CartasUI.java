@@ -19,6 +19,7 @@ public class CartasUI {
     frame.setContentPane(this.rootPanel);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.pack();
+    frame.setResizable(false);
     frame.setVisible(true);
 
     this.createTabs();
@@ -56,8 +57,8 @@ public class CartasUI {
   private void resetCards(JPanel playerPanel) {
     Component[] cardLabels = playerPanel.getComponents();
 
-    for (int i = 0; i < cardLabels.length; i++) {
-      JLabel cardLabel = (JLabel) cardLabels[i];
+    for (Component label : cardLabels) {
+      JLabel cardLabel = (JLabel) label;
       cardLabel.setIcon(getCardImage());
     }
   }
@@ -81,6 +82,7 @@ public class CartasUI {
   }
 
   private void dealButtonActionPerformed() {
+    //noinspection ConstantValue
     if (playerTabs == null || game == null) {
       return;
     }
@@ -106,6 +108,7 @@ public class CartasUI {
   }
 
   private void showButtonActionPerformed() {
+    //noinspection ConstantValue
     if (playerTabs == null || game == null) {
       return;
     }
