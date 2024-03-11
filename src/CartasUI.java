@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.net.URL;
-import java.util.Vector;
+import java.util.ArrayList;
 
 public class CartasUI {
   private JPanel rootPanel;
@@ -10,6 +10,7 @@ public class CartasUI {
   private JButton dealButton;
   private JButton showButton;
   private JButton verifyButton;
+  private JButton sortButton;
 
   public void run(Game game) {
     this.game = game;
@@ -70,12 +71,12 @@ public class CartasUI {
   }
 
   private void updateCards(JPanel playerPanel, Player player) {
-    Card[] playerCards = player.getCards();
+    ArrayList<Card> playerCards = player.getCards();
     Component[] cardLabels = playerPanel.getComponents();
 
     for (int j = 0; j < cardLabels.length; j++) {
       JLabel cardLabel = (JLabel) cardLabels[j];
-      cardLabel.setIcon(getCardImage(playerCards[j]));
+      cardLabel.setIcon(getCardImage(playerCards.get(j)));
     }
   }
 
@@ -101,6 +102,7 @@ public class CartasUI {
     playerTabs.repaint();
     showButton.setEnabled(true);
     verifyButton.setEnabled(false);
+    sortButton.setEnabled(false);
   }
 
   private void showButtonActionPerformed() {
@@ -118,38 +120,37 @@ public class CartasUI {
       updateCards(playerPanel, player);
     }
 
+    playerTabs.repaint();
     showButton.setEnabled(false);
     verifyButton.setEnabled(true);
-    playerTabs.repaint();
+    sortButton.setEnabled(true);
   }
 
   private void verifyButtonActionPerformed() {
     int currentPlayerIndex = playerTabs.getSelectedIndex();
     Player currentPlayer = game.getPlayers()[currentPlayerIndex];
 
-    Vector<Card.Name> pairs = currentPlayer.getPairs();
-    Vector<Card.Name> trips = currentPlayer.getTrips();
-    Vector<Card.Name> quads = currentPlayer.getQuads();
 
     StringBuilder message = new StringBuilder();
 
-    for (Card.Name pair : pairs) {
-      message.append("Par de ").append(pair).append("\n");
+    for (Figure figure : currentPlayer.getFigures()) {
+      message.append(figure.toString()).append("\n");
     }
 
-    for (Card.Name trip : trips) {
-      message.append("Terna de ").append(trip).append("\n");
-    }
-
-    for (Card.Name quad : quads) {
-      message.append("Cuarta de ").append(quad).append("\n");
-    }
-
-    if (message.length() == 0) {
+    if (message.isEmpty()) {
       message.append("No hay pares, ternas, cuartas o escaleras");
     }
 
+    message.append("Puntaje: ").append(currentPlayer.getScore()).append("\n");
+
     JOptionPane.showMessageDialog(null, message.toString());
+  }
+
+  private void sortButtonActionPerformed() {
+    int currentPlayerIndex = playerTabs.getSelectedIndex();
+    Player currentPlayer = game.getPlayers()[currentPlayerIndex];
+    currentPlayer.sortCards();
+    updateCards((JPanel) playerTabs.getComponent(currentPlayerIndex), currentPlayer);
   }
 
   private void createUIComponents() {
@@ -161,5 +162,8 @@ public class CartasUI {
 
     verifyButton = new JButton();
     verifyButton.addActionListener(e -> verifyButtonActionPerformed());
+
+    sortButton = new JButton();
+    sortButton.addActionListener(e -> sortButtonActionPerformed());
   }
 }

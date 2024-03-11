@@ -23,8 +23,43 @@ public class Card {
     return name;
   }
 
+  public String getSuitString() {
+    return switch (suit) {
+      case CLUB -> "Tréboles";
+      case SPADE -> "Picas";
+      case HEART -> "Corazones";
+      case DIAMOND -> "Diamantes";
+    };
+  }
+
+  public String getNameString() {
+    return switch (name) {
+      case ACE -> "As";
+      case TWO -> "Dos";
+      case THREE -> "Tres";
+      case FOUR -> "Cuatro";
+      case FIVE -> "Cinco";
+      case SIX -> "Seis";
+      case SEVEN -> "Siete";
+      case EIGHT -> "Ocho";
+      case NINE -> "Nueve";
+      case TEN -> "Diez";
+      case JACK -> "Jota";
+      case QUEEN -> "Reina";
+      case KING -> "Rey";
+    };
+  }
+
   public int getIndex() {
     return index;
+  }
+
+  public int getValue() {
+    if (name.ordinal() > 9) {
+      return 10;
+    }
+
+    return name.ordinal() + 1;
   }
 
   public enum Suit {
@@ -33,9 +68,5 @@ public class Card {
 
   public enum Name {
     ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING
-  }
-
-  public enum Figure {
-    NONE, PAIR, TRIPS, QUADS
   }
 }

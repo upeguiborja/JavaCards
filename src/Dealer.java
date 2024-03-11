@@ -1,6 +1,6 @@
 public class Dealer {
   // Clase para representar al repartidor de cartas
-  private Deck deck;
+  private final Deck deck;
 
   public Dealer() {
     // Inicializar la baraja
@@ -12,7 +12,7 @@ public class Dealer {
       throw new IllegalArgumentException("Number of players must be between 1 and 5");
     }
 
-    if (deck.getCards().length < players.length * n) {
+    if (deck.getCards().size() < players.length * n) {
       deck.resetCards();
     }
 
