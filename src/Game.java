@@ -1,0 +1,23 @@
+public class Game {
+  private Player[] players;
+  private Dealer dealer;
+
+  public Game() {
+    // Crear jugadores y repartidor
+    Player player1 = new Player("Martín Estrada Contreras", null);
+    Player player2 = new Player("Raúl Vidal", null);
+    Player player3 = new Player("Mateo Upegui Borja", null);
+
+    players = new Player[]{player1, player2, player3};
+    dealer = new Dealer();
+  }
+
+  public Player[] getPlayers() {
+    return players;
+  }
+
+  public void dealCards() {
+    // Repartir 10 cartas a los jugadores
+    dealer.dealCards(players, 10);
+  }
+}
