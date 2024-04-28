@@ -1,3 +1,5 @@
+![img.png](img.png)
+
 # Como compilar
 
 La compilación de este proyectó se probó utilizando la versión del compilador de java `javac v1.8.0_412`, también 
