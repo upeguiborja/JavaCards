@@ -24,30 +24,45 @@ public class Card {
   }
 
   public String getSuitString() {
-    return switch (suit) {
-      case CLUB -> "Tréboles";
-      case SPADE -> "Picas";
-      case HEART -> "Corazones";
-      case DIAMOND -> "Diamantes";
-    };
+    if (suit == Suit.CLUB) {
+      return "Tréboles";
+    } else if (suit == Suit.SPADE) {
+      return "Picas";
+    } else if (suit == Suit.HEART) {
+      return "Corazones";
+    } else {
+      return "Diamantes";
+    }
   }
 
   public String getNameString() {
-    return switch (name) {
-      case ACE -> "As";
-      case TWO -> "Dos";
-      case THREE -> "Tres";
-      case FOUR -> "Cuatro";
-      case FIVE -> "Cinco";
-      case SIX -> "Seis";
-      case SEVEN -> "Siete";
-      case EIGHT -> "Ocho";
-      case NINE -> "Nueve";
-      case TEN -> "Diez";
-      case JACK -> "Jota";
-      case QUEEN -> "Reina";
-      case KING -> "Rey";
-    };
+    if (name == Name.ACE) {
+      return "As";
+    } else if (name == Name.TWO) {
+      return "Dos";
+    } else if (name == Name.THREE) {
+      return "Tres";
+    } else if (name == Name.FOUR) {
+      return "Cuatro";
+    } else if (name == Name.FIVE) {
+      return "Cinco";
+    } else if (name == Name.SIX) {
+      return "Seis";
+    } else if (name == Name.SEVEN) {
+      return "Siete";
+    } else if (name == Name.EIGHT) {
+      return "Ocho";
+    } else if (name == Name.NINE) {
+      return "Nueve";
+    } else if (name == Name.TEN) {
+      return "Diez";
+    } else if (name == Name.JACK) {
+      return "Jota";
+    } else if (name == Name.QUEEN) {
+      return "Reina";
+    } else {
+      return "Rey";
+    }
   }
 
   public int getIndex() {

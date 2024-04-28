@@ -17,7 +17,7 @@ public class Figure {
     StringBuilder figureString = new StringBuilder();
 
     if (type == Type.FLUSH) {
-      figureString.append("Escalera de ").append(cards.getFirst().getSuitString().toLowerCase()).append(" [");
+      figureString.append("Escalera de ").append(cards.get(0).getSuitString().toLowerCase()).append(" [");
 
       for (int i = 0; i < cards.size(); i++) {
         figureString.append(cards.get(i).getNameString());
@@ -30,11 +30,11 @@ public class Figure {
       figureString.append("]");
       return figureString.toString();
     } else if (type == Type.QUADS) {
-      figureString.append("Poker de ").append(cards.getFirst().getNameString());
+      figureString.append("Poker de ").append(cards.get(0).getNameString());
     } else if (type == Type.TRIPS) {
-      figureString.append("Trio de ").append(cards.getFirst().getNameString());
+      figureString.append("Trio de ").append(cards.get(0).getNameString());
     } else if (type == Type.PAIR) {
-      figureString.append("Par de ").append(cards.getFirst().getNameString());
+      figureString.append("Par de ").append(cards.get(0).getNameString());
     }
 
     return figureString.toString();

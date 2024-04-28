@@ -5,32 +5,43 @@ import java.util.ArrayList;
 
 public class CartasUI {
   private JPanel rootPanel;
-  private Game game;
+  private final Game game;
   private JTabbedPane playerTabs;
-  private JButton dealButton;
   private JButton showButton;
   private JButton verifyButton;
   private JButton sortButton;
 
-  public void run(Game game) {
+  public CartasUI(Game game) {
     this.game = game;
+    setupUI();
+  }
 
+  public void run() {
     JFrame frame = new JFrame("Cartas");
     frame.setContentPane(this.rootPanel);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.pack();
     frame.setResizable(false);
     frame.setVisible(true);
-
-    this.createTabs();
   }
 
-  private void createTabs() {
+  private void createTabPanels() {
     playerTabs.removeAll();
 
     for (Player player : game.getPlayers()) {
       JPanel playerPanel = new JPanel();
+      playerPanel.setLayout(new GridBagLayout());
       playerTabs.addTab(player.getName(), playerPanel);
+
+      for (int i = 0; i < 10; i++) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = i;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        playerPanel.add(new JLabel(getCardImage()), gbc);
+      }
     }
   }
 
@@ -82,7 +93,6 @@ public class CartasUI {
   }
 
   private void dealButtonActionPerformed() {
-    //noinspection ConstantValue
     if (playerTabs == null || game == null) {
       return;
     }
@@ -108,7 +118,6 @@ public class CartasUI {
   }
 
   private void showButtonActionPerformed() {
-    //noinspection ConstantValue
     if (playerTabs == null || game == null) {
       return;
     }
@@ -140,7 +149,7 @@ public class CartasUI {
       message.append(figure.toString()).append("\n");
     }
 
-    if (message.isEmpty()) {
+    if (message.length() == 0) {
       message.append("No hay pares, ternas, cuartas o escaleras");
     }
 
@@ -156,17 +165,64 @@ public class CartasUI {
     updateCards((JPanel) playerTabs.getComponent(currentPlayerIndex), currentPlayer);
   }
 
-  private void createUIComponents() {
-    dealButton = new JButton();
+  private void setupUI() {
+    rootPanel = new JPanel();
+    rootPanel.setLayout(new GridBagLayout());
+
+    GridBagConstraints gbc;
+
+    JButton dealButton = new JButton();
     dealButton.addActionListener(e -> dealButtonActionPerformed());
+    dealButton.setText("Deal");
+
+    gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    rootPanel.add(dealButton, gbc);
 
     showButton = new JButton();
     showButton.addActionListener(e -> showButtonActionPerformed());
+    showButton.setText("Show");
+
+    gbc = new GridBagConstraints();
+    gbc.gridx = 1;
+    gbc.gridy = 0;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    rootPanel.add(showButton, gbc);
 
     verifyButton = new JButton();
     verifyButton.addActionListener(e -> verifyButtonActionPerformed());
+    verifyButton.setEnabled(false);
+    verifyButton.setText("Verify");
+
+    gbc = new GridBagConstraints();
+    gbc.gridx = 2;
+    gbc.gridy = 0;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    rootPanel.add(verifyButton, gbc);
 
     sortButton = new JButton();
     sortButton.addActionListener(e -> sortButtonActionPerformed());
+    sortButton.setEnabled(false);
+    sortButton.setText("Sort");
+
+    gbc = new GridBagConstraints();
+    gbc.gridx = 4;
+    gbc.gridy = 0;
+    gbc.anchor = GridBagConstraints.EAST;
+    rootPanel.add(sortButton, gbc);
+
+    playerTabs = new JTabbedPane();
+
+    gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.gridy = 1;
+    gbc.gridwidth = 5;
+    gbc.weighty = 1.0;
+    gbc.fill = GridBagConstraints.BOTH;
+    rootPanel.add(playerTabs, gbc);
+
+    this.createTabPanels();
   }
 }

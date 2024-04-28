@@ -10,6 +10,7 @@ public class Game {
 
     players = new Player[]{player1, player2, player3};
     dealer = new Dealer();
+    dealCards();
   }
 
   public Player[] getPlayers() {
